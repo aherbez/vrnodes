@@ -1,11 +1,23 @@
 import * as THREE from 'three';
+import { ZeroSlopeEnding } from 'three';
+import { PointerLockControls } from '../node_modules/three/examples/jsm/controls/PointerLockControls';
+
+const DIR_FORWARD = 0;
+const DIR_RIGHT = 1;
+const DIR_BACK = 2;
+const DIR_LEFT = 3;
 
 export class NodesVR {
     constructor(elName) {
         this.scene = null;
         this.camera = null;
         this.size = null;
+
+        this.move = [0,0,0,0];
+        this.velocity = new THREE.Vector3();
+        this.direction = new THREE.Vector3();
         
+        this.prevTime = performance.now();
         this.init(elName);
     }
 
@@ -16,6 +28,7 @@ export class NodesVR {
         };
         
         this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color("#9bb9eb");
         this.renderer = new THREE.WebGLRenderer({
             canvas: document.getElementById(elName)
         });
@@ -25,8 +38,6 @@ export class NodesVR {
 
         this.scene.add(this.camera);
 
-        this.light = new THREE.HemisphereLight(0xffffbb, 0x080820);
-        this.scene.add(this.light);
 
         this.resize();
         window.addEventListener('resize', () => {
@@ -43,7 +54,58 @@ export class NodesVR {
         this.addTestGeo();
         this.addFloor();
 
+        this.controls = new PointerLockControls(this.camera, document.body);
+        window.addEventListener('click', () => {
+            this.controls.lock();
+        });
+
+        window.addEventListener('keydown', (e) => this.keydown(e));
+        window.addEventListener('keyup', (e) => this.keyup(e));
+
         requestAnimationFrame(this.update.bind(this));
+    }
+
+    keydown(event) {
+        console.log(event.code);
+        switch (event.code) {
+            case 'ArrowUp':
+            case 'KeyW':
+                this.move[DIR_FORWARD] = 1;
+                break;
+            case 'ArrowLeft':
+            case 'KeyA':
+                this.move[DIR_LEFT] = 1;
+                break;
+            case 'ArrowDown':
+            case 'KeyS':
+                this.move[DIR_BACK] = 1;
+                break;
+            case 'ArrowRight':
+            case 'KeyD':
+                this.move[DIR_RIGHT] = 1;
+                break;
+        }
+    }
+
+    keyup(event) {
+        switch (event.code) {
+            case 'ArrowUp':
+            case 'KeyW':
+                this.move[DIR_FORWARD] = 0;
+                break;
+            case 'ArrowLeft':
+            case 'KeyA':
+                this.move[DIR_LEFT] = 0;
+                break;
+            case 'ArrowDown':
+            case 'KeyS':
+                this.move[DIR_BACK] = 0;
+                break;
+            case 'ArrowRight':
+            case 'KeyD':
+                this.move[DIR_RIGHT] = 0;
+                break;
+        }
     }
 
     addTestGeo() {
@@ -55,6 +117,16 @@ export class NodesVR {
         const mesh = new THREE.Mesh(geometry, material);
         this.scene.add(mesh);
         
+    }
+
+    addLight() {
+        const light = new THREE.HemisphereLight(0xbbbbff, 0x080820);
+        const helper = new THREE.HemisphereLightHelper(light);
+        
+        
+        this.scene.add(light);
+        this.scene.add(helper);
+
     }
 
     addFloor() {
@@ -120,8 +192,27 @@ export class NodesVR {
     }
 
     update() {
-        this.render();
+        const now = performance.now();
+        const delta = now - this.prevTime;
+        this.prevTime = now;
+
+        this.direction.z = this.move[DIR_FORWARD] - this.move[DIR_BACK];
+        this.direction.x = this.move[DIR_RIGHT] - this.move[DIR_LEFT];
+        this.direction.normalize();
+
+        // console.log(this.move);
+
+        const speed = .01;
+
+        this.velocity.x -= this.velocity.x * 10.0 * delta;
+        this.velocity.z -= this.velocity.z * 10.0 * delta;
+
+        this.controls.moveRight(this.direction.x * speed * delta);
+        this.controls.moveForward(this.direction.z * speed * delta);
         
+        // console.log(this.direction);
+        this.render();
+
         
         requestAnimationFrame(this.update.bind(this));
     }
