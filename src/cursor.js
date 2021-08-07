@@ -10,25 +10,28 @@ export class Cursor extends THREE.Object3D {
         ctx.canvas.width = 32;
         ctx.canvas.height = 32;
 
-        ctx.fillStyle = "rbga(0, 0, 1, 0.3)";
+        // ctx.fillStyle = "rbga(0, 0, 1, 0.3)";
         ctx.clearRect(0, 0, 32, 32);
-        ctx.fillRect(0, 0, 32, 32);
+        // ctx.fillRect(0, 0, 32, 32);
 
         ctx.lineWidth = 3;
         ctx.strokeStyle = "#fff";
         ctx.beginPath();
-        ctx.moveTo(5, 16);
-        ctx.lineTo(27, 16);
-        ctx.moveTo(16, 5);
-        ctx.lineTo(16, 27);
+        ctx.moveTo(0, 16);
+        ctx.lineTo(32, 16);
+        ctx.moveTo(16, 0);
+        ctx.lineTo(16, 32);
         ctx.stroke();
 
         const tex = new THREE.CanvasTexture(ctx.canvas);
 
 
+
+
         const cGeo = new THREE.PlaneGeometry(0.005,0.005);
         const cMat = new THREE.MeshBasicMaterial({
-            map: tex,
+            color: 0xffffff,
+            alphaMap: tex,
             transparent: true
         });
 

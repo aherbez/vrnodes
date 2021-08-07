@@ -23,6 +23,8 @@ export class NodesVR {
         this.velocity = new THREE.Vector3();
         this.direction = new THREE.Vector3();
         
+        this.raycast = new THREE.Raycaster();
+
         this.editing = false;
 
         this.prevTime = performance.now();
@@ -42,20 +44,16 @@ export class NodesVR {
         });
         this.camera = new THREE.PerspectiveCamera(75, this.size.width / this.size.height);
 
-        this.panel = new NodePanel();
+        this.panel = new NodePanel(this.camera);
         this.scene.add(this.panel);
 
-        this.inv = new Inventory();
-        this.scene.add(this.inv);
-        this.inv.visible = false;
+        // this.inv = new Inventory(this.camera);
+        // this.scene.add(this.inv);
 
         this.camera.position.z = 3;
         this.camera.position.y = 1.68;
 
         this.scene.add(this.camera);
-
-        this.cursor = new Cursor();
-        this.camera.add(this.cursor);
 
         this.resize();
         window.addEventListener('resize', () => {
@@ -67,6 +65,15 @@ export class NodesVR {
             this.camera.updateProjectionMatrix();
             this.renderer.setSize(this.size.width, this.size.height);
     
+        });
+
+        this.mouse = {
+            x: 0,
+            y: 0
+        }
+        window.addEventListener('mousemove', (evt) => {
+            this.mouse.x = (evt.clientX / window.innerWidth) * 2 - 1;
+            this.mouse.y = (evt.clientY / window.innerHeight) * 2 + 1;
         });
 
         this.addTestGeo();
@@ -85,7 +92,7 @@ export class NodesVR {
     }
 
     keydown(event) {
-        console.log(event.code);
+        // console.log(event.code);
         switch (event.code) {
             case 'ArrowUp':
             case 'KeyW':
@@ -109,20 +116,6 @@ export class NodesVR {
         }
     }
 
-    toggleEditing() {
-        if (this.editing) {
-            this.panel.hide();
-            this.inv.visible = false;
-        } else {
-            this.panel.position.copy(this.camera.position);
-            this.panel.show();
-            
-            this.inv.setBasePosition(this.camera);
-            this.inv.visible = true;
-        }
-        this.editing = !this.editing;
-    }
-
     keyup(event) {
         switch (event.code) {
             case 'ArrowUp':
@@ -144,6 +137,21 @@ export class NodesVR {
         }
     }
 
+    toggleEditing() {
+        if (this.editing) {
+            this.panel.hide();
+            // this.inv.hide();
+        } else {
+            // this.panel.position.copy(this.camera.position);
+            this.panel.show();
+            
+            // this.inv.setBasePosition(this.camera);
+            // this.inv.visible = true;
+            // this.inv.show();
+        }
+        this.editing = !this.editing;
+    }
+
     addTestGeo() {
         console.log("adding test geo");
         const geometry = new THREE.BoxGeometry(1,2,1);
@@ -162,7 +170,7 @@ export class NodesVR {
         const sun = new THREE.DirectionalLight(0xffffff, 0.5);
         const sunHelper = new THREE.DirectionalLightHelper(sun);
 
-        this.scene.add(sunHelper);
+        // this.scene.add(sunHelper);
         this.scene.add(sun.target);
 
         this.scene.add(sun);
@@ -238,10 +246,19 @@ export class NodesVR {
         this.renderer.setSize(this.size.width, this.size.height);
     }
 
+    checkRays() {
+        // this.inv.checkRays();
+        this.panel.checkRays();
+    }
+
     update() {
         const now = performance.now();
         const delta = now - this.prevTime;
         this.prevTime = now;
+
+        // this.calcRaycast();
+
+        this.checkRays();
 
         this.direction.z = this.move[DIR_FORWARD] - this.move[DIR_BACK];
         this.direction.x = this.move[DIR_RIGHT] - this.move[DIR_LEFT];
@@ -260,6 +277,9 @@ export class NodesVR {
         }
 
         // console.log(this.camera.rotation);
+
+        // this.inv.update(delta);
+        this.panel.update(delta);
 
         this.render();        
         requestAnimationFrame(this.update.bind(this));
