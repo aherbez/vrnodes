@@ -4,6 +4,7 @@ import { PointerLockControls } from '../node_modules/three/examples/jsm/controls
 
 import { NodePanel } from './nodepanel';
 import { Inventory } from './inventory';
+import { Cursor } from './cursor';
 
 
 const DIR_FORWARD = 0;
@@ -49,10 +50,12 @@ export class NodesVR {
         this.inv.visible = false;
 
         this.camera.position.z = 3;
-        this.camera.position.y = 2;
+        this.camera.position.y = 1.68;
 
         this.scene.add(this.camera);
 
+        this.cursor = new Cursor();
+        this.camera.add(this.cursor);
 
         this.resize();
         window.addEventListener('resize', () => {
@@ -113,8 +116,8 @@ export class NodesVR {
         } else {
             this.panel.position.copy(this.camera.position);
             this.panel.show();
-
-            this.inv.position.copy(this.camera.position);
+            
+            this.inv.setBasePosition(this.camera);
             this.inv.visible = true;
         }
         this.editing = !this.editing;
@@ -256,7 +259,7 @@ export class NodesVR {
             this.controls.moveForward(this.direction.z * speed * delta);
         }
 
-        console.log(this.camera.rotation);
+        // console.log(this.camera.rotation);
 
         this.render();        
         requestAnimationFrame(this.update.bind(this));
