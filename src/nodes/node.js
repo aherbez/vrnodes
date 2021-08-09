@@ -25,15 +25,45 @@ export class Node extends THREE.Object3D {
         const node = new THREE.Mesh(nGeo, nMat);
         this.base = node;
         super.add(node);
-    
+
+        this.ioLookup = {};    
         this.addInputs();
         this.addOutputs();
+
+        this.addLabel();
+
     }
 
     get uuid() {
         return this.base.uuid;
     }
     set uuid(n) {}
+
+    addLabel() {
+        const ctx = document.createElement('canvas').getContext('2d');
+        ctx.canvas.width = 256;
+        ctx.canvas.height = 256;
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0,0, 256, 256);
+
+        const metrics = ctx.measureText(this.data.name);
+        const s = (220 / metrics.width);
+        ctx.scale(s,s);
+        ctx.fillStyle = "#fff";
+        ctx.fillText(this.data.name, 0, 10);
+
+        const cTex = new THREE.CanvasTexture(ctx.canvas);
+
+        const lGeo = new THREE.PlaneGeometry(WIDTH*0.9, WIDTH*0.9, 1, 1);
+        const lMat = new THREE.MeshBasicMaterial({
+            alphaMap: cTex,
+            transparent: true
+        });
+
+        const label = new THREE.Mesh(lGeo, lMat);
+        label.position.set(0, 0, DEPTH * 0.51);
+        super.add(label);
+    }
 
     addInputs() {
         const totalH = HEIGHT * 0.6;
@@ -43,6 +73,13 @@ export class Node extends THREE.Object3D {
             const slot = this.makeSlot(inputType);
             slot.rotateZ(Math.PI/2);
             slot.position.set(-(WIDTH/2), (index * spacing) - (totalH/2), -(DEPTH/2));     
+            
+            this.ioLookup[slot.uuid] = {
+                isOutput: false,
+                num: index,
+                type: inputType
+            };
+            
             super.add(slot);
         });
     }
@@ -56,8 +93,17 @@ export class Node extends THREE.Object3D {
             slot.rotateZ(-Math.PI/2);
             slot.position.set((WIDTH/2), (index * spacing) - (totalH/2), -(DEPTH/2));     
             super.add(slot);
+
+            this.ioLookup[slot.uuid] = {
+                isOutput: true,
+                num: index,
+                type: output.type
+            };
+
         });
     }
+
+
 
     makeSlot(slotType) {
         const inputGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.15, 16, 1);

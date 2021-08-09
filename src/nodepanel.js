@@ -11,7 +11,7 @@ export class NodePanel extends THREE.Object3D {
         this.cam = camera;
         this.raycast = new THREE.Raycaster();
 
-        this.radius = 1;
+        this.radius = 1.5;
 
         const gCanvas = new THREE.SphereGeometry(this.radius, 32, 32);
         const mCanvas = new THREE.MeshBasicMaterial({
@@ -64,7 +64,6 @@ export class NodePanel extends THREE.Object3D {
         this.cursor.visible = true;
 
         this.intersectedObjects.forEach(hit => {
-            console.log(hit);
             if (this.nodeLookup[hit.object.uuid]) {
                 this.draggingNode = this.nodeLookup[hit.object.uuid];
             }
