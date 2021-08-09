@@ -51,6 +51,8 @@ export class NodePanel extends THREE.Object3D {
             this.mouseUp(evt);
         });
 
+        this.intersectedObjects = [];
+
         this.initCursor();
 
         this.hide();
@@ -151,12 +153,13 @@ export class NodePanel extends THREE.Object3D {
         this.selected = null;
 
         this.raycast.setFromCamera(new THREE.Vector2(), this.cam);
-        const intersects = this.raycast.intersectObjects(this.children, true);
+        this.intersectedObjects = this.raycast.intersectObjects(this.children, true);
 
 
-        if (intersects.length > 0) {
-
-            intersects.forEach(hit => {
+        if (this.intersectedObjects.length > 0) {
+            console.log(this.intersectedObjects);
+            this.intersectedObjects.forEach(hit => {
+                
                 if (hit.object.uuid === this.base.uuid) {
                     this.cursor.position.copy(hit.point);
                     this.cursor.position.sub(this.cam.position);

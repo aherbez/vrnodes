@@ -2,7 +2,7 @@ export const nodeList = [
     {
         color: 0xff0000,
         name: "add",
-        inputs: [ "number", "number"],
+        inputs: [ "number","vector", "bool" ],
         outputs: [{
             type: "number",
             function: (a,b) => { return a + b;}

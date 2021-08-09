@@ -6,6 +6,8 @@ import { NodePanel } from './nodepanel';
 import { Inventory } from './inventory';
 import { Cursor } from './cursor';
 
+import { Node } from './nodes/node';
+import { nodeList } from './nodes/node_data';
 
 const DIR_FORWARD = 0;
 const DIR_RIGHT = 1;
@@ -46,9 +48,6 @@ export class NodesVR {
 
         this.panel = new NodePanel(this.camera);
         this.scene.add(this.panel);
-
-        // this.inv = new Inventory(this.camera);
-        // this.scene.add(this.inv);
 
         this.camera.position.z = 3;
         this.camera.position.y = 1.68;
@@ -140,14 +139,8 @@ export class NodesVR {
     toggleEditing() {
         if (this.editing) {
             this.panel.hide();
-            // this.inv.hide();
         } else {
-            // this.panel.position.copy(this.camera.position);
             this.panel.show();
-            
-            // this.inv.setBasePosition(this.camera);
-            // this.inv.visible = true;
-            // this.inv.show();
         }
         this.editing = !this.editing;
     }
@@ -160,7 +153,14 @@ export class NodesVR {
         });
         const mesh = new THREE.Mesh(geometry, material);
         this.scene.add(mesh);
+
         
+        nodeList.forEach((data, index) => {
+            const n = new Node(data);
+            n.position.set(index + 1, 1, 0);
+            this.scene.add(n);
+        });
+
     }
 
     addLight() {
@@ -247,7 +247,6 @@ export class NodesVR {
     }
 
     checkRays() {
-        // this.inv.checkRays();
         this.panel.checkRays();
     }
 
@@ -256,15 +255,11 @@ export class NodesVR {
         const delta = now - this.prevTime;
         this.prevTime = now;
 
-        // this.calcRaycast();
-
         this.checkRays();
 
         this.direction.z = this.move[DIR_FORWARD] - this.move[DIR_BACK];
         this.direction.x = this.move[DIR_RIGHT] - this.move[DIR_LEFT];
         this.direction.normalize();
-
-        // console.log(this.move);
 
         const speed = .01;
 
@@ -276,9 +271,6 @@ export class NodesVR {
             this.controls.moveForward(this.direction.z * speed * delta);
         }
 
-        // console.log(this.camera.rotation);
-
-        // this.inv.update(delta);
         this.panel.update(delta);
 
         this.render();        
