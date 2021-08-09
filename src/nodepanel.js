@@ -5,6 +5,21 @@ import { makeBox } from './utils';
 import { Node } from './nodes/node';
 import { nodeList } from './nodes/node_data';
 
+const vertexShaderSource = `
+    varying vec2 v_uv;
+    void main() {
+        v_uv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }`;
+
+const fragmentShaderSource = `
+    varying vec2 v_uv;
+    void main() {
+        // float alpha = smoothstep(0.1,0.9,st.x);
+        gl_FragColor = vec4(v_uv.y, 1.0, 1.0, 0.2);
+    }
+`;
+
 export class NodePanel extends THREE.Object3D {
     constructor(camera) {
         super();
@@ -19,8 +34,24 @@ export class NodePanel extends THREE.Object3D {
             wireframe: true,
             side: THREE.BackSide
         });
+
+        this.uniforms = {
+
+        }
+
+        console.log(vertexShaderSource);
+        const mShader = new THREE.ShaderMaterial({
+            vertexShader: vertexShaderSource,
+            fragmentShader: fragmentShaderSource,
+            uniforms: this.uniforms,
+            side: THREE.BackSide,
+            transparent: true
+        });
+
         const nodeCanvas = new THREE.Mesh(gCanvas, mCanvas);
-        // box.layers.enable(1);
+        nodeCanvas.visible = false;
+        const renderCanvas = new THREE.Mesh(gCanvas, mShader);
+        super.add(renderCanvas);
         super.add(nodeCanvas);
         this.base = nodeCanvas;
 
@@ -67,6 +98,8 @@ export class NodePanel extends THREE.Object3D {
             if (this.nodeLookup[hit.object.uuid]) {
                 this.draggingNode = this.nodeLookup[hit.object.uuid];
             }
+
+
         });
 
 
@@ -176,6 +209,7 @@ export class NodePanel extends THREE.Object3D {
                     if (this.draggingNode) {
                         this.draggingNode.position.copy(hit.point);
                         this.draggingNode.position.sub(this.cam.position);
+                        this.draggingNode.position.multiplyScalar(0.8);
 
                         this.draggingNode.lookAt(this.cam.position);
                     }
