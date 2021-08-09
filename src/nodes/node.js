@@ -67,7 +67,9 @@ export class Node extends THREE.Object3D {
 
     addInputs() {
         const totalH = HEIGHT * 0.6;
-        const spacing = totalH / (this.data.inputs.length - 1);
+        const spacing = (this.data.inputs.length > 1) ? 
+            totalH / (this.data.inputs.length - 1) :
+            0;
 
         this.data.inputs.forEach((inputType, index) => {
             const slot = this.makeSlot(inputType);
