@@ -52,6 +52,7 @@ export class NodePanel extends THREE.Object3D {
         });
 
         this.intersectedObjects = [];
+        this.nodeLookup = {};
 
         this.initCursor();
 
@@ -62,11 +63,20 @@ export class NodePanel extends THREE.Object3D {
         this.crosshair.visible = false;
         this.cursor.visible = true;
 
+        this.intersectedObjects.forEach(hit => {
+            console.log(hit);
+            if (this.nodeLookup[hit.object.uuid]) {
+                this.draggingNode = this.nodeLookup[hit.object.uuid];
+            }
+        });
+
+
         // spawn a new node and have it follow the mouse
         if (this.selected !== null) {
             const n = new Node(nodeList[this.selected]);
             super.add(n);
             this.draggingNode = n;
+            this.nodeLookup[n.uuid] = n;
         }
     }
 
@@ -157,7 +167,7 @@ export class NodePanel extends THREE.Object3D {
 
 
         if (this.intersectedObjects.length > 0) {
-            console.log(this.intersectedObjects);
+            // console.log(this.intersectedObjects);
             this.intersectedObjects.forEach(hit => {
                 
                 if (hit.object.uuid === this.base.uuid) {

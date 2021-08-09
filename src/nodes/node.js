@@ -23,11 +23,17 @@ export class Node extends THREE.Object3D {
             color: color
         });
         const node = new THREE.Mesh(nGeo, nMat);
+        this.base = node;
         super.add(node);
     
         this.addInputs();
         this.addOutputs();
     }
+
+    get uuid() {
+        return this.base.uuid;
+    }
+    set uuid(n) {}
 
     addInputs() {
         const totalH = HEIGHT * 0.6;
