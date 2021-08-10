@@ -24,10 +24,6 @@ export class Cursor extends THREE.Object3D {
         ctx.stroke();
 
         const tex = new THREE.CanvasTexture(ctx.canvas);
-
-
-
-
         const cGeo = new THREE.PlaneGeometry(0.005,0.005);
         const cMat = new THREE.MeshBasicMaterial({
             color: 0xffffff,

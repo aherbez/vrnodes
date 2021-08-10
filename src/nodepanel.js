@@ -14,9 +14,28 @@ const vertexShaderSource = `
 
 const fragmentShaderSource = `
     varying vec2 v_uv;
+    
+    float smoothStrip(float min, float max, float smoothVal, float u) {
+        return (smoothstep(min-smoothVal, min, u) * smoothstep(max+smoothVal, max, u));
+    }
+
+    float grid(vec2 uv) {
+        return max(sin(uv.x*400.0),cos(uv.y*200.0));
+    }
+    
     void main() {
-        // float alpha = smoothstep(0.1,0.9,st.x);
-        gl_FragColor = vec4(v_uv.y, 1.0, 1.0, 0.2);
+        // float alphaX = smoothstep(0.2,0.25,v_uv.x) * smoothstep(0.65, 0.6, v_uv.x);
+        // float alphaY = smoothstep(0.2,0.25,v_uv.y) * smoothstep(0.65, 0.6, v_uv.y);
+        float alpha = smoothStrip(0.25, 0.75, 0.02, v_uv.x) * 
+            smoothStrip(0.3, 0.7, 0.02, v_uv.y);
+
+        vec3 color1 = vec3(0.0, 1.0, 0.0);
+        vec3 color2 = vec3(0.0);
+
+        float g = grid(v_uv);
+        vec3 color = (g > 0.9) ? color1 : color2;
+
+        gl_FragColor = vec4(color, alpha * 0.3);
     }
 `;
 
@@ -30,16 +49,11 @@ export class NodePanel extends THREE.Object3D {
 
         const gCanvas = new THREE.SphereGeometry(this.radius, 32, 32);
         const mCanvas = new THREE.MeshBasicMaterial({
-            color: new THREE.Color("slateblue"),
-            wireframe: true,
             side: THREE.BackSide
         });
 
-        this.uniforms = {
+        this.uniforms = {};
 
-        }
-
-        console.log(vertexShaderSource);
         const mShader = new THREE.ShaderMaterial({
             vertexShader: vertexShaderSource,
             fragmentShader: fragmentShaderSource,
@@ -51,6 +65,7 @@ export class NodePanel extends THREE.Object3D {
         const nodeCanvas = new THREE.Mesh(gCanvas, mCanvas);
         nodeCanvas.visible = false;
         const renderCanvas = new THREE.Mesh(gCanvas, mShader);
+        renderCanvas.rotateY(Math.PI/2);
         super.add(renderCanvas);
         super.add(nodeCanvas);
         this.base = nodeCanvas;
