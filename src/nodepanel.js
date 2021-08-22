@@ -20,7 +20,7 @@ const fragmentShaderSource = `
     }
 
     float grid(vec2 uv) {
-        return max(sin(uv.x*400.0),cos(uv.y*200.0));
+        return max(sin(uv.x*200.0),cos(uv.y*100.0));
     }
     
     void main() {
@@ -33,9 +33,9 @@ const fragmentShaderSource = `
         vec3 color2 = vec3(0.0);
 
         float g = grid(v_uv);
-        vec3 color = (g > 0.9) ? color1 : color2;
+        vec3 color = (g > 0.98) ? color1 : color2;
 
-        gl_FragColor = vec4(color, alpha * 0.3);
+        gl_FragColor = vec4(color, alpha * 0.7);
     }
 `;
 

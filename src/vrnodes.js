@@ -9,6 +9,10 @@ import { Cursor } from './cursor';
 import { Node } from './nodes/node';
 import { nodeList } from './nodes/node_data';
 
+import { Cord } from './cord';
+import { testParse } from './parser/parser';
+
+
 const DIR_FORWARD = 0;
 const DIR_RIGHT = 1;
 const DIR_BACK = 2;
@@ -31,6 +35,8 @@ export class NodesVR {
 
         this.prevTime = performance.now();
         this.init(elName);
+        
+        testParse();
     }
 
     init(elName) {
@@ -86,6 +92,12 @@ export class NodesVR {
 
         window.addEventListener('keydown', (e) => this.keydown(e));
         window.addEventListener('keyup', (e) => this.keyup(e));
+
+        // this.testCord = new Cord(
+        //     new THREE.Vector3(-1, 2, 0),
+        //     new THREE.Vector3(1, 2, 0)
+        // );
+        // this.scene.add(this.testCord);
 
         requestAnimationFrame(this.update.bind(this));
     }
@@ -146,7 +158,6 @@ export class NodesVR {
     }
 
     addTestGeo() {
-        console.log("adding test geo");
         const geometry = new THREE.BoxGeometry(1,2,1);
         const material = new THREE.MeshLambertMaterial({
             color: 0x00FFFF
@@ -254,6 +265,8 @@ export class NodesVR {
         const now = performance.now();
         const delta = now - this.prevTime;
         this.prevTime = now;
+
+        // this.testCord.update(delta);
 
         this.checkRays();
 

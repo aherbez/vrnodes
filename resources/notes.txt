@@ -1,0 +1,17 @@
+node language:
+
+types: number, vector, bool, string(?)
+
+
+inputs:
+    name type
+    name type
+    name type
+
+outputs:
+    type function
+    type function
+
+-------------------------
+
+
