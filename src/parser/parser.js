@@ -137,7 +137,6 @@ function buildTree(parts, inputs) {
 
     parts.forEach(token => {
         if (operators.has(token)) {
-            console.log(`operator: ${token}`);
             let newNode = {
                 type: NODE_OPERATION,
                 parent: curr,
@@ -176,7 +175,6 @@ function buildTree(parts, inputs) {
                 newNode.parent = curr;
                 curr.children.push(newNode);
                 while (curr.parent !== null && isComplete(curr)) {
-                    console.log(`completed ${curr.value}`);
                     curr = curr.parent;
                     currInOp = curr.type === NODE_OPERATION;
                 }
@@ -185,7 +183,6 @@ function buildTree(parts, inputs) {
             }
         
         } else if (inputs.has(token)) {
-            console.log('variable');
             // variable
             let newNode = {
                 type: NODE_VARIABLE,
@@ -197,7 +194,6 @@ function buildTree(parts, inputs) {
                 newNode.parent = curr;
                 curr.children.push(newNode);
                 while (curr.parent !== null && isComplete(curr)) {
-                    console.log(`completed ${curr.value}`);
                     curr = curr.parent;
                     currInOp = curr.type === NODE_OPERATION;
                 }
@@ -227,7 +223,6 @@ function buildTree(parts, inputs) {
 
         } else if (isParen(token)) {
             if (token === '(') {
-                console.log('open parens: ', curr);
                 let newNode = {
                     type: NODE_PAREN,
                     parent: curr,
@@ -278,9 +273,7 @@ function buildTree(parts, inputs) {
         root.children.push(tNode);
     }
 
-    console.log(root.children);
     if (root.children.length === 1) {
-        console.log(root.children[0]);
         return root.children[0];    
     }
     console.error("Could not parse expression");
@@ -311,7 +304,6 @@ function treeToFunction(root, vars) {
     
     const noOp = (args) => args;
     
-    console.log(vars);
     switch (root.type) {
         case NODE_CONSTANT:
             return (args) => root.value;
@@ -325,8 +317,6 @@ function treeToFunction(root, vars) {
             if (Array.isArray(root.value)) {
                 let varIndex = vars.indexOf(root.value[0]);
                 let accessorIndex = accessorIndexFor(root.value[1]);
-                console.log(varIndex);
-                console.log(accessorIndex);
                 if (varIndex !== -1 && accessorIndex !== -1) {
                     return (args) => {
                         if (Array.isArray(args[varIndex])) {
@@ -350,7 +340,7 @@ function treeToFunction(root, vars) {
                             treeToFunction(root.children[1], vars)(args)
                         );
                     }
-                    return null;
+                    return noOp;
                 case '*':
                     if (root.children.length == 2) {                    
                         return (args) => (
@@ -358,7 +348,7 @@ function treeToFunction(root, vars) {
                             treeToFunction(root.children[1], vars)(args)
                         );
                     }
-                    return null;
+                    return noOp;
                 case '-':
                     if (root.children.length == 2) {                    
                         return (args) => (
@@ -366,7 +356,7 @@ function treeToFunction(root, vars) {
                             treeToFunction(root.children[1], vars)(args)
                         );
                     }
-                    return null;
+                    return noOp;
                 case '/':
                     if (root.children.length == 2) {                    
                         return (args) => (
@@ -374,7 +364,7 @@ function treeToFunction(root, vars) {
                             treeToFunction(root.children[1], vars)(args)
                         );
                     }
-                    return null;
+                    return noOp;
                 case '^':
                     if (root.children.length == 2) {                    
                         return (args) => (
@@ -382,7 +372,7 @@ function treeToFunction(root, vars) {
                             treeToFunction(root.children[1], vars)(args))
                         );
                     }
-                    return null;
+                    return noOp;
                 case 'sin':
                     if (root.children.length == 1) {
                         return (args) => (
@@ -395,14 +385,14 @@ function treeToFunction(root, vars) {
                             Math.cos(treeToFunction(root.children[0], vars)(args))
                         );
                     }
-                    return null;
+                    return noOp;
                 case 'tan':
                     if (root.children.length == 1) {
                         return (args) => (
                             Math.tan(treeToFunction(root.children[0], vars)(args))
                         );
                     }
-                    return null;
+                    return noOp;
             }
     }
 }

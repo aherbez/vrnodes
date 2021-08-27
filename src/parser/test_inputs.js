@@ -6,8 +6,12 @@ input: \
     d vector \
 \
 output: \
-    number: (d.g + 1)  \
+    number: (d.y + a) * b  \
+    number: a * b \
+    number: (d.x + c) / b \
 ";
+
+
 
 const test2 = "\
 input: \
