@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { ZeroSlopeEnding } from 'three';
 import { PointerLockControls } from '../node_modules/three/examples/jsm/controls/PointerLockControls';
+import { GLTFLoader } from '../node_modules/three/examples/jsm/loaders/GLTFLoader';
 
 import { NodePanel } from './nodepanel';
 import { Inventory } from './inventory';
@@ -11,13 +12,13 @@ import { nodeList } from './nodes/node_data';
 
 import { Cord } from './cord';
 import { testParse } from './parser/parser';
+import { City } from './env/city';
 
 
 const DIR_FORWARD = 0;
 const DIR_RIGHT = 1;
 const DIR_BACK = 2;
 const DIR_LEFT = 3;
-
 
 export class NodesVR {
     constructor(elName) {
@@ -37,6 +38,14 @@ export class NodesVR {
         this.init(elName);
         
         testParse();
+
+        this.city = new City();
+        this.scene.add(this.city.scene);
+       
+    }
+
+    async runInit() {
+        this.city.init();
     }
 
     init(elName) {
@@ -81,7 +90,8 @@ export class NodesVR {
             this.mouse.y = (evt.clientY / window.innerHeight) * 2 + 1;
         });
 
-        this.addTestGeo();
+        // this.addTestGeo();
+        
         this.addFloor();
         this.addLight();
 
@@ -174,11 +184,12 @@ export class NodesVR {
 
     }
 
+
     addLight() {
-        const light = new THREE.HemisphereLight(0xbbbbff, 0x080820, 0.8);
+        const light = new THREE.HemisphereLight(0xbbbbff, 0x080820, 2);
         const helper = new THREE.HemisphereLightHelper(light);
         
-        const sun = new THREE.DirectionalLight(0xffffff, 0.5);
+        const sun = new THREE.DirectionalLight(0xffffff, 2);
         const sunHelper = new THREE.DirectionalLightHelper(sun);
 
         // this.scene.add(sunHelper);
@@ -191,7 +202,7 @@ export class NodesVR {
         sun.rotateY(0.8);
         
         this.scene.add(light);
-        // this.scene.add(helper);
+        //this.scene.add(helper);
 
     }
 

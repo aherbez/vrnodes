@@ -1,0 +1,17 @@
+{
+    "models" : [
+        {"id": 1, "src": "small_buildingA.glb"},
+        {"id": 2, "src": "small_buildingB.glb"},
+        {"id": 3, "src": "small_buildingC.glb"},
+        {"id": 4, "src": "small_buildingD.glb"},
+        {"id": 5, "src": "small_buildingE.glb"},
+        {"id": 6, "src": "small_buildingF.glb"}
+    ],
+    "positions" : [
+        [1, 0, 0, -10, 0],
+        [2, -7.5, 0, -10, 0],
+        [1, -15, 0, -10, 0],
+        [4, 8, 0, -10, 0],
+        [1, 15, 0, -10, 0]
+    ]
+}
