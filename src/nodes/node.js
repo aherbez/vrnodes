@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
-const HEIGHT = 0.4;
-const WIDTH = 0.3;
+const HEIGHT = 0.3;
+const WIDTH = 0.4;
 const DEPTH = 0.1;
 
 export class Node extends THREE.Object3D {
@@ -10,6 +10,8 @@ export class Node extends THREE.Object3D {
     static matVector = new THREE.MeshBasicMaterial({color: 0x00FF00});
     static matBool = new THREE.MeshBasicMaterial({color: 0xAAAAAA});
     static matSlot = new THREE.MeshBasicMaterial({color: 0x444444});
+
+    static matIntersect = new THREE.MeshBasicMaterial({color: 0xFF00FF});
 
     constructor(data) {
         super();
@@ -31,6 +33,8 @@ export class Node extends THREE.Object3D {
         this.addOutputs();
 
         this.addLabel();
+
+        this.objLookup = new Map();
 
     }
 
@@ -110,7 +114,9 @@ export class Node extends THREE.Object3D {
     makeSlot(slotType) {
         const inputGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.15, 16, 1);
         const slot = new THREE.Mesh(inputGeo, Node.matSlot);
-        
+        const intersectionGeo = new THREE.CylinderGeometry(0.07, 0.07, 0.15, 5, 1);
+        const hitTarget = new THREE.Mesh(intersectionGeo, Node.matIntersect);
+        // console.log(hitTarget.uuid);
         let mat = null;
         switch (slotType) {
             case "number":
@@ -131,6 +137,7 @@ export class Node extends THREE.Object3D {
         const ring = new THREE.Mesh(ringGeo, mat);
         ring.position.set(0, 0.05, 0);
         slot.add(ring); 
+        slot.add(hitTarget);
         return slot;
     }
 

@@ -110,13 +110,14 @@ export class NodePanel extends THREE.Object3D {
         this.cursor.visible = true;
 
         this.intersectedObjects.forEach(hit => {
+            // console.log(`clicked on ${hit.object.uuid}`);
+            
             if (this.nodeLookup[hit.object.uuid]) {
                 this.draggingNode = this.nodeLookup[hit.object.uuid];
             }
 
-
         });
-
+        if (this.draggingNode) return;
 
         // spawn a new node and have it follow the mouse
         if (this.selected !== null) {
@@ -212,11 +213,10 @@ export class NodePanel extends THREE.Object3D {
         this.raycast.setFromCamera(new THREE.Vector2(), this.cam);
         this.intersectedObjects = this.raycast.intersectObjects(this.children, true);
 
+        // console.log('nodepanel intersects: ', this.intersectedObjects.length);
 
         if (this.intersectedObjects.length > 0) {
-            // console.log(this.intersectedObjects);
             this.intersectedObjects.forEach(hit => {
-                
                 if (hit.object.uuid === this.base.uuid) {
                     this.cursor.position.copy(hit.point);
                     this.cursor.position.sub(this.cam.position);

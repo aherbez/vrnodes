@@ -14,6 +14,8 @@ import { Cord } from './cord';
 import { testParse } from './parser/parser';
 import { City } from './env/city';
 
+import { ObjLookup } from './obj_lookup';
+
 
 const DIR_FORWARD = 0;
 const DIR_RIGHT = 1;
@@ -25,6 +27,8 @@ export class NodesVR {
         this.scene = null;
         this.camera = null;
         this.size = null;
+
+        this.root = new THREE.Object3D();
 
         this.move = [0,0,0,0];
         this.velocity = new THREE.Vector3();
@@ -38,9 +42,6 @@ export class NodesVR {
         this.init(elName);
         
         testParse();
-
-        this.city = new City();
-        this.scene.add(this.city.scene);
        
     }
 
@@ -60,6 +61,8 @@ export class NodesVR {
             canvas: document.getElementById(elName)
         });
         this.camera = new THREE.PerspectiveCamera(75, this.size.width / this.size.height);
+
+        this.scene.add(this.root);
 
         this.panel = new NodePanel(this.camera);
         this.scene.add(this.panel);
@@ -90,10 +93,15 @@ export class NodesVR {
             this.mouse.y = (evt.clientY / window.innerHeight) * 2 + 1;
         });
 
-        // this.addTestGeo();
+        this.registry = new ObjLookup(this.camera, this.root);
+
+        this.addTestGeo();
         
         this.addFloor();
         this.addLight();
+
+        this.city = new City();
+        this.root.add(this.city.scene);
 
         this.controls = new PointerLockControls(this.camera, document.body);
         window.addEventListener('click', () => {
@@ -168,13 +176,27 @@ export class NodesVR {
     }
 
     addTestGeo() {
-        const geometry = new THREE.BoxGeometry(1,2,1);
+        const geometry = new THREE.BoxGeometry(1,1,1);
         const material = new THREE.MeshLambertMaterial({
             color: 0x00FFFF
         });
         const mesh = new THREE.Mesh(geometry, material);
-        this.scene.add(mesh);
+        mesh.position.setY(0.5);
+        this.root.add(mesh);
 
+        this.registry.setOnClick(mesh, (id) => {
+            console.log(`clicked box (id ${id})`);
+        });
+
+        this.registry.setMouseOver(mesh, (id) => {
+            mesh.scale.setScalar(1.2);
+        });
+
+        this.registry.setMouseOut(mesh, (id) => {
+            mesh.scale.setScalar(1);
+        });
+
+        return;
         
         nodeList.forEach((data, index) => {
             const n = new Node(data);
@@ -255,7 +277,7 @@ export class NodesVR {
         });
         const floor = new THREE.Mesh(floorGeo, floorMat);
         floor.position.y = -0.5;
-        this.scene.add(floor);
+        this.root.add(floor);
     }
 
     resize() {
@@ -270,6 +292,8 @@ export class NodesVR {
 
     checkRays() {
         this.panel.checkRays();
+        this.registry?.update(this.root);        
+
     }
 
     update() {
