@@ -20,9 +20,9 @@ class ObjLookup {
     }
 
     onClick() {
-        this.lookingAt.curr.forEach( obj => {
-            if (this.onClickCBs.has(obj)) {
-                this.onClickCBs.get(obj)(obj);
+        this.lookingAt.curr.forEach( (hit, id) => {
+            if (this.onClickCBs.has(id)) {
+                this.onClickCBs.get(id)(hit);
             }
         })
         
@@ -43,20 +43,17 @@ class ObjLookup {
     update(scene) {
         this.raycast.setFromCamera(new THREE.Vector2(), this.cam);
         const hits = this.raycast.intersectObjects(this.root.children, true);
-        const objIds = hits.map(hit => {
-            return hit.object.uuid;
-        });
-
-        this.lookingAt.update(objIds);
         
-        this.lookingAt.newlyAbsent.forEach(id => {
+        this.lookingAt.update(hits, (hit) => hit.object.uuid);
+        
+        this.lookingAt.newlyAbsent.forEach((hit, id) => {
             if (this.onMouseOutCBs.has(id)) {
-                this.onMouseOutCBs.get(id)(id);
+                this.onMouseOutCBs.get(id)(hit);
             }
         });
-        this.lookingAt.newlyPresent.forEach(id => {
+        this.lookingAt.newlyPresent.forEach((hit, id) => {
             if (this.onMouseOverCBs.has(id)) {
-                this.onMouseOverCBs.get(id)(id);
+                this.onMouseOverCBs.get(id)(hit);
             }
         });
 

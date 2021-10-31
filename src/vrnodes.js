@@ -184,15 +184,17 @@ export class NodesVR {
         mesh.position.setY(0.5);
         this.root.add(mesh);
 
-        this.registry.setOnClick(mesh, (id) => {
-            console.log(`clicked box (id ${id})`);
+        this.registry.setOnClick(mesh, (hit) => {
+            console.log(`clicked box (id ${hit})`, hit);
         });
 
-        this.registry.setMouseOver(mesh, (id) => {
+        this.registry.setMouseOver(mesh, (hit) => {
+            console.log(hit.distance);
             mesh.scale.setScalar(1.2);
         });
 
-        this.registry.setMouseOut(mesh, (id) => {
+        this.registry.setMouseOut(mesh, (hit) => {
+            console.log(hit);
             mesh.scale.setScalar(1);
         });
 

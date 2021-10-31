@@ -9,12 +9,12 @@ class BufferedSet {
     constructor() {
         this.current = 0;
         this.sets = [
-            new Set(),
-            new Set()
+            new Map(),
+            new Map()
         ];
 
-        this.newlyPresent = new Set();
-        this.newlyAbsent = new Set();
+        this.newlyPresent = new Map();
+        this.newlyAbsent = new Map();
     }
 
     get curr() {
@@ -26,24 +26,32 @@ class BufferedSet {
         return this.sets[prev];
     }
 
-    update(items) {
+    update(items, keyFn) {
         this.current = (this.current + 1) % 2;
         this.curr.clear();
         
         items.forEach( i => {
-            this.curr.add(i);
+            // this.curr.add(i);
+            this.curr.set(keyFn(i), i);
         })
         
-        this.newlyAbsent = new Set(this.prev);
+        this.newlyAbsent = new Map(this.prev);
+        this.curr.forEach((v, k) => {
+            this.newlyAbsent.delete(k);
+        })
+        /*
         for (let i of this.curr) {
             this.newlyAbsent.delete(i);
         }
+        */
 
-        this.newlyPresent = new Set(this.curr);
-        for (let i of this.prev) {
-            this.newlyPresent.delete(i);
-        }
-
+        this.newlyPresent = new Map(this.curr);
+        // for (let i of this.prev) {
+        //     this.newlyPresent.delete(i);
+        // }
+        this.prev.forEach((v,k) => {
+            this.newlyPresent.delete(k);
+        })
 
 
     }
