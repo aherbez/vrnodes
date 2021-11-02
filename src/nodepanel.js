@@ -40,8 +40,9 @@ const fragmentShaderSource = `
 `;
 
 export class NodePanel extends THREE.Object3D {
-    constructor(camera) {
+    constructor(camera, rcManager) {
         super();
+        this.rcManager = rcManager;
         this.cam = camera;
         this.raycast = new THREE.Raycaster();
 
@@ -160,6 +161,19 @@ export class NodePanel extends THREE.Object3D {
             object: g,
             hover: false
         });
+
+        this.rcManager.setOnClick(obj, () => {
+            console.log(`clicked on option: ${obj.uuid}`);
+        })
+
+        this.rcManager.setMouseOver(obj, () => {
+            console.log(`mouse over`);
+            g.scale.multiplyScalar(1.2);
+        });
+        this.rcManager.setMouseOut(obj, () => {
+            g.scale.multiplyScalar(1);
+        })
+
         this.updateOptions();
     }
 
@@ -213,10 +227,27 @@ export class NodePanel extends THREE.Object3D {
         this.raycast.setFromCamera(new THREE.Vector2(), this.cam);
         this.intersectedObjects = this.raycast.intersectObjects(this.children, true);
 
-        // console.log('nodepanel intersects: ', this.intersectedObjects.length);
+        const baseIntersection = this.rcManager.currentIntersection(this.base);
+        // console.log(baseIntersection);
+        if (baseIntersection) {
+            // this.cursor.position.copy(baseIntersection);
+            // this.cursor.position.sub(this.cam.position);
+            // this.cursor.position.multiplyScalar(0.9);
 
+            // if (this.draggingNode) {
+            //     this.draggingNode.position.copy(baseIntersection);
+            //     this.draggingNode.position.sub(this.cam.position);
+            //     this.draggingNode.position.multiplyScalar(0.8);
+            //     this.draggingNode.lookAt(this.cam.position);
+            // }
+        } else {
+            // console.log(`not looking at ${this.base.uuid}`);
+        }
+        
         if (this.intersectedObjects.length > 0) {
+            
             this.intersectedObjects.forEach(hit => {
+
                 if (hit.object.uuid === this.base.uuid) {
                     this.cursor.position.copy(hit.point);
                     this.cursor.position.sub(this.cam.position);
@@ -237,6 +268,7 @@ export class NodePanel extends THREE.Object3D {
                 }
             })            
         }
+        
     }
 
 }

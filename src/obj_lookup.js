@@ -7,8 +7,6 @@ class ObjLookup {
         this.raycast = new THREE.Raycaster();
         this.cam = camera;
         this.root = root;
-        console.log(`children: ${this.root.children.length}`);
-        console.log('ObjLookup: ', this.cam, this.root);
 
         this.onClickCBs = new Map();
         this.onMouseOverCBs = new Map();
@@ -16,7 +14,9 @@ class ObjLookup {
 
         this.lookingAt = new BufferedSet();
 
-        window.addEventListener('click', () => this.onClick())
+        window.addEventListener('click', () => this.onClick());
+        window.addEventListener('mousedown', () => this.onMouseDown());
+        window.addEventListener('mouseup', () => this.onMouseUp());
     }
 
     onClick() {
@@ -25,8 +25,11 @@ class ObjLookup {
                 this.onClickCBs.get(id)(hit);
             }
         })
-        
     }
+
+    onMouseDown() {}
+
+    onMouseUp() {}
 
     setOnClick(object, cb) {
         this.onClickCBs.set(object.uuid, cb);
@@ -40,9 +43,28 @@ class ObjLookup {
         this.onMouseOutCBs.set(object.uuid, cb);
     }
 
+    currentIntersection(object) {
+        const curr = this.lookingAt.curr.get(object.uuid);
+        if (curr) {
+            return curr.point;
+        }
+        return null;
+    }
+
+    distanceTo(object) {
+        const curr = this.lookingAt.curr.get(object.uuid);
+        if (curr) {
+            return curr.distance;
+        }
+        // TODO: maybe return null instead?
+        return Infinity;
+    }
+
     update(scene) {
         this.raycast.setFromCamera(new THREE.Vector2(), this.cam);
-        const hits = this.raycast.intersectObjects(this.root.children, true);
+
+        const inputs = this.root.children.filter(c => c.raycast && typeof c.raycast === "function");
+        const hits = this.raycast.intersectObjects(inputs, true);
         
         this.lookingAt.update(hits, (hit) => hit.object.uuid);
         
@@ -57,6 +79,7 @@ class ObjLookup {
             }
         });
 
+        // console.log(Array.from(this.lookingAt.curr.keys()));
     }
 }
 

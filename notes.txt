@@ -3,7 +3,7 @@ TODO
 detect cursor on slots
 change display of slots on mouseover
 start a new cord when clicking on a slot
-
+refactor nodepanel to use new registry
 
 
 

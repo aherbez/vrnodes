@@ -137,7 +137,7 @@ export class Node extends THREE.Object3D {
         const ring = new THREE.Mesh(ringGeo, mat);
         ring.position.set(0, 0.05, 0);
         slot.add(ring); 
-        slot.add(hitTarget);
+        // slot.add(hitTarget);
         return slot;
     }
 

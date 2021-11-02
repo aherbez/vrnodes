@@ -61,11 +61,12 @@ export class NodesVR {
             canvas: document.getElementById(elName)
         });
         this.camera = new THREE.PerspectiveCamera(75, this.size.width / this.size.height);
+        this.registry = new ObjLookup(this.camera, this.root);
 
         this.scene.add(this.root);
 
-        this.panel = new NodePanel(this.camera);
-        this.scene.add(this.panel);
+        this.panel = new NodePanel(this.camera, this.registry);
+        this.root.add(this.panel);
 
         this.camera.position.z = 3;
         this.camera.position.y = 1.68;
@@ -93,7 +94,6 @@ export class NodesVR {
             this.mouse.y = (evt.clientY / window.innerHeight) * 2 + 1;
         });
 
-        this.registry = new ObjLookup(this.camera, this.root);
 
         this.addTestGeo();
         
@@ -190,7 +190,7 @@ export class NodesVR {
 
         this.registry.setMouseOver(mesh, (hit) => {
             console.log(hit.distance);
-            mesh.scale.setScalar(1.2);
+            mesh.scale.setScalar(2);
         });
 
         this.registry.setMouseOut(mesh, (hit) => {
@@ -292,12 +292,6 @@ export class NodesVR {
         this.renderer.setSize(this.size.width, this.size.height);
     }
 
-    checkRays() {
-        this.panel.checkRays();
-        this.registry?.update(this.root);        
-
-    }
-
     update() {
         const now = performance.now();
         const delta = now - this.prevTime;
@@ -305,7 +299,8 @@ export class NodesVR {
 
         // this.testCord.update(delta);
 
-        this.checkRays();
+        this.registry?.update(this.scene);        
+        this.panel.checkRays();
 
         this.direction.z = this.move[DIR_FORWARD] - this.move[DIR_BACK];
         this.direction.x = this.move[DIR_RIGHT] - this.move[DIR_LEFT];
