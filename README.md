@@ -1,6 +1,10 @@
 # vrnodes
 
-Experimental interface for node-based development in VR. To see it in action, check out this video: https://www.youtube.com/watch?v=OE4Kxt2VKjg, or play with the live version here: https://adrianherbez.net/vrnodes/02/
+Experimental interface for node-based development in VR. 
+
+To see it in action, check out this video: https://www.youtube.com/watch?v=OE4Kxt2VKjg
+
+Alternatively, play with the live version here: https://adrianherbez.net/vrnodes/02/
 
 ## What it is
 
